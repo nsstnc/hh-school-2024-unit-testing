@@ -7,6 +7,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.mockito.Mockito.when;
+
 @ExtendWith(MockitoExtension.class)
 public class LibraryManagerTest {
   @Mock
@@ -54,5 +56,27 @@ public class LibraryManagerTest {
     );
   }
 
-  
+  @Test
+  void testBorrowBookWithInActiveUser(){
+    when(userService.isUserActive("1")).thenReturn(false);
+    boolean result = libraryManager.borrowBook("1", "1");
+    Assertions.assertFalse(result);
+  }
+
+  @Test
+  void testBorrowBookWithActiveUser(){
+    when(userService.isUserActive("1")).thenReturn(true);
+    libraryManager.addBook("1", 2);
+    boolean result = libraryManager.borrowBook("1", "1");
+    Assertions.assertTrue(result);
+  }
+
+  @Test
+  void testBorrowBookWithoutAvailableCopies(){
+    when(userService.isUserActive("1")).thenReturn(true);
+    boolean result = libraryManager.borrowBook("1", "1");
+    Assertions.assertFalse(result);
+  }
+
+
 }
