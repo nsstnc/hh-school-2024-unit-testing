@@ -78,5 +78,30 @@ public class LibraryManagerTest {
     Assertions.assertFalse(result);
   }
 
+  @Test
+  void testReturnBookWithoutBorrowedBook(){
+    boolean result = libraryManager.returnBook("1", "1");
+    Assertions.assertFalse(result);
+  }
+
+  @Test
+  void testReturnBookWithoutBorrowedBookByUser(){
+    when(userService.isUserActive("1")).thenReturn(true);
+    libraryManager.addBook("1", 2);
+    libraryManager.borrowBook("1", "1");
+
+    boolean result = libraryManager.returnBook("1", "2");
+    Assertions.assertFalse(result);
+  }
+
+  @Test
+  void testReturnBook(){
+    when(userService.isUserActive("1")).thenReturn(true);
+    libraryManager.addBook("1", 2);
+    libraryManager.borrowBook("1", "1");
+
+    boolean result = libraryManager.returnBook("1", "1");
+    Assertions.assertTrue(result);
+  }
 
 }
