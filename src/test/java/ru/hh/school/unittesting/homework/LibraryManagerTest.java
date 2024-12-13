@@ -2,22 +2,20 @@ package ru.hh.school.unittesting.homework;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+@ExtendWith(MockitoExtension.class)
 public class LibraryManagerTest {
+  @Mock
+  private UserService userService;
+  @Mock
+  private NotificationService notificationService;
 
-  private final UserService userService = new UserService() {
-    @Override
-    public boolean isUserActive(String userId) {
-      return false;
-    }
-  };
-  private final NotificationService notificationService = new NotificationService() {
-    @Override
-    public void notifyUser(String userId, String message) {
-
-    }
-  };
-  private final LibraryManager libraryManager = new LibraryManager(notificationService, userService);
+  @InjectMocks
+  private LibraryManager libraryManager;
 
 
   @Test
