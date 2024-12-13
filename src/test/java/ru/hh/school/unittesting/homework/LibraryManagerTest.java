@@ -3,6 +3,8 @@ package ru.hh.school.unittesting.homework;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -19,10 +21,16 @@ public class LibraryManagerTest {
   @InjectMocks
   private LibraryManager libraryManager;
 
-
-  @Test
-  void testCalculateDynamicLateFeeWithoutBestSellerAndPremiumMember() {
-    double dynamicLateFee = libraryManager.calculateDynamicLateFee(10, false, false);
+  @ParameterizedTest
+  @CsvSource({
+      "10, false, false",
+  })
+  void testCalculateDynamicLateFeeWithoutBestSellerAndPremiumMember(
+      Integer overdueDays,
+      Boolean isBestseller,
+      Boolean isPremiumMember
+  ) {
+    double dynamicLateFee = libraryManager.calculateDynamicLateFee(overdueDays, isBestseller, isPremiumMember);
 
     Assertions.assertEquals(5, dynamicLateFee);
 
