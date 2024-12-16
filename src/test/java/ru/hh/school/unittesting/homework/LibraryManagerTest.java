@@ -23,27 +23,24 @@ public class LibraryManagerTest {
 
   @ParameterizedTest
   @CsvSource({
-      "10, false, false",
+      "10, false, false, 5",
+      "10, true, true, 6",
+      "10, true, false, 7.5",
+      "10, false, true, 4",
+      "0, false, true, 0",
   })
-  void testCalculateDynamicLateFeeWithoutBestSellerAndPremiumMember(
+  void testCalculateDynamicLateFee(
       Integer overdueDays,
       Boolean isBestseller,
-      Boolean isPremiumMember
+      Boolean isPremiumMember,
+      double expectedDynamicLateFee
   ) {
     double dynamicLateFee = libraryManager.calculateDynamicLateFee(overdueDays, isBestseller, isPremiumMember);
 
-    Assertions.assertEquals(5, dynamicLateFee);
+    Assertions.assertEquals(expectedDynamicLateFee, dynamicLateFee);
 
   }
 
-
-  @Test
-  void testCalculateDynamicLateFeeWithBestSellerAndPremiumMember() {
-    double dynamicLateFee = libraryManager.calculateDynamicLateFee(10, true, true);
-
-    Assertions.assertEquals(6, dynamicLateFee);
-
-  }
 
   @Test
   void calculateDynamicLateFeeShouldThrowException() {
@@ -52,7 +49,7 @@ public class LibraryManagerTest {
   }
 
   @Test
-  void testAddBook(){
+  void testAddBook() {
     libraryManager.addBook("1", 2);
     libraryManager.addBook("2", 3);
     libraryManager.addBook("1", 4);
@@ -65,14 +62,14 @@ public class LibraryManagerTest {
   }
 
   @Test
-  void testBorrowBookWithInActiveUser(){
+  void testBorrowBookWithInActiveUser() {
     when(userService.isUserActive("1")).thenReturn(false);
     boolean result = libraryManager.borrowBook("1", "1");
     Assertions.assertFalse(result);
   }
 
   @Test
-  void testBorrowBookWithActiveUser(){
+  void testBorrowBookWithActiveUser() {
     when(userService.isUserActive("1")).thenReturn(true);
     libraryManager.addBook("1", 2);
     boolean result = libraryManager.borrowBook("1", "1");
@@ -80,20 +77,20 @@ public class LibraryManagerTest {
   }
 
   @Test
-  void testBorrowBookWithoutAvailableCopies(){
+  void testBorrowBookWithoutAvailableCopies() {
     when(userService.isUserActive("1")).thenReturn(true);
     boolean result = libraryManager.borrowBook("1", "1");
     Assertions.assertFalse(result);
   }
 
   @Test
-  void testReturnBookWithoutBorrowedBook(){
+  void testReturnBookWithoutBorrowedBook() {
     boolean result = libraryManager.returnBook("1", "1");
     Assertions.assertFalse(result);
   }
 
   @Test
-  void testReturnBookWithoutBorrowedBookByUser(){
+  void testReturnBookWithoutBorrowedBookByUser() {
     when(userService.isUserActive("1")).thenReturn(true);
     libraryManager.addBook("1", 2);
     libraryManager.borrowBook("1", "1");
@@ -103,7 +100,7 @@ public class LibraryManagerTest {
   }
 
   @Test
-  void testReturnBook(){
+  void testReturnBook() {
     when(userService.isUserActive("1")).thenReturn(true);
     libraryManager.addBook("1", 2);
     libraryManager.borrowBook("1", "1");
