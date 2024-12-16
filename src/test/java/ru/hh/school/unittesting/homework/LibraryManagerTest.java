@@ -10,6 +10,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
 class LibraryManagerTest {
@@ -60,7 +63,10 @@ class LibraryManagerTest {
   void testBorrowBookWithInActiveUser() {
     when(userService.isUserActive("1")).thenReturn(false);
     boolean result = libraryManager.borrowBook("1", "1");
+
     Assertions.assertFalse(result);
+    verify(notificationService).notifyUser("1", "Your account is not active.");
+    verifyNoMoreInteractions(notificationService);
   }
 
   @Test
@@ -68,22 +74,29 @@ class LibraryManagerTest {
     when(userService.isUserActive("1")).thenReturn(true);
     libraryManager.addBook("1", 1);
     boolean result = libraryManager.borrowBook("1", "1");
+
     Assertions.assertTrue(result);
     Assertions.assertEquals(0, libraryManager.getAvailableCopies("1"));
+    verify(notificationService).notifyUser("1", "You have borrowed the book: 1");
+    verifyNoMoreInteractions(notificationService);
   }
 
   @Test
   void testBorrowBookWithoutAvailableCopies() {
     when(userService.isUserActive("1")).thenReturn(true);
     boolean result = libraryManager.borrowBook("1", "1");
+
     Assertions.assertFalse(result);
     Assertions.assertEquals(0, libraryManager.getAvailableCopies("1"));
+    verifyNoInteractions(notificationService);
   }
 
   @Test
   void testReturnBookWithoutBorrowedBook() {
     boolean result = libraryManager.returnBook("1", "1");
+
     Assertions.assertFalse(result);
+    verifyNoInteractions(notificationService);
   }
 
   @Test
@@ -93,8 +106,11 @@ class LibraryManagerTest {
     libraryManager.borrowBook("1", "1");
 
     boolean result = libraryManager.returnBook("1", "2");
+
     Assertions.assertFalse(result);
     Assertions.assertEquals(0, libraryManager.getAvailableCopies("1"));
+    verify(notificationService).notifyUser("1", "You have borrowed the book: 1");
+    verifyNoMoreInteractions(notificationService);
 
   }
 
@@ -107,6 +123,9 @@ class LibraryManagerTest {
     boolean result = libraryManager.returnBook("1", "1");
     Assertions.assertTrue(result);
     Assertions.assertEquals(1, libraryManager.getAvailableCopies("1"));
+    verify(notificationService).notifyUser("1", "You have borrowed the book: 1");
+    verify(notificationService).notifyUser("1", "You have returned the book: 1");
+    verifyNoMoreInteractions(notificationService);
   }
 
 }
