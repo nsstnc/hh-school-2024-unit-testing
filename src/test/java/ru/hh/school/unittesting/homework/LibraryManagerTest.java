@@ -66,9 +66,10 @@ public class LibraryManagerTest {
   @Test
   void testBorrowBookWithActiveUser() {
     when(userService.isUserActive("1")).thenReturn(true);
-    libraryManager.addBook("1", 2);
+    libraryManager.addBook("1", 1);
     boolean result = libraryManager.borrowBook("1", "1");
     Assertions.assertTrue(result);
+    Assertions.assertEquals(0, libraryManager.getAvailableCopies("1"));
   }
 
   @Test
@@ -76,6 +77,7 @@ public class LibraryManagerTest {
     when(userService.isUserActive("1")).thenReturn(true);
     boolean result = libraryManager.borrowBook("1", "1");
     Assertions.assertFalse(result);
+    Assertions.assertEquals(0, libraryManager.getAvailableCopies("1"));
   }
 
   @Test
@@ -87,21 +89,24 @@ public class LibraryManagerTest {
   @Test
   void testReturnBookWithoutBorrowedBookByUser() {
     when(userService.isUserActive("1")).thenReturn(true);
-    libraryManager.addBook("1", 2);
+    libraryManager.addBook("1", 1);
     libraryManager.borrowBook("1", "1");
 
     boolean result = libraryManager.returnBook("1", "2");
     Assertions.assertFalse(result);
+    Assertions.assertEquals(0, libraryManager.getAvailableCopies("1"));
+
   }
 
   @Test
   void testReturnBook() {
     when(userService.isUserActive("1")).thenReturn(true);
-    libraryManager.addBook("1", 2);
+    libraryManager.addBook("1", 1);
     libraryManager.borrowBook("1", "1");
 
     boolean result = libraryManager.returnBook("1", "1");
     Assertions.assertTrue(result);
+    Assertions.assertEquals(1, libraryManager.getAvailableCopies("1"));
   }
 
 }
